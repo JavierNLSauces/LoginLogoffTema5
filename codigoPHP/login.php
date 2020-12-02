@@ -1,12 +1,34 @@
 <?php
 /**
  *   @author: Javier Nieto Lorenzo
- *   @since: 01/12/2020
+ *   @since: 02/12/2020
  *   Login
  */
-if(isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si se ha l
-    header('Location: programa.php');
-    exit;
+if(!isset($_COOKIE['idioma'])){
+    setcookie('idioma','es',time()+2592000,'codigoPHP'); // crea la cookie 'idioma' con el valor 'es' para 30 dias
+}else{
+    if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
+        setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+        header('Location: login.php');
+        exit;
+    }
+
+    if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
+        setcookie('idioma', $_REQUEST['en'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+        header('Location: login.php');
+        exit;
+    }
+}
+switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
+    case 'es':
+        $usuario = "Usuario";
+        $contrasena = "Contraseña";
+        break;
+
+    case 'en':
+        $usuario = "User";
+        $contrasena = "Password";
+        break;
 }
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos de formularios
@@ -60,7 +82,7 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
             
             session_start(); // inicia una sesion, o recupera una existente
             $_SESSION['usuarioDAW217LoginLogoffTema5'] = $oUsuario->T01_CodUsuario; // guarda en la session el valor del usuario
-            $_SESSION['ultimaConexionDAW217LoginLogoffTema5'] = $oUsuario->T01_FechaHoraUltimaConexion; // guarda en la sesion el valor de la ultima conexion del usuario
+            $_SESSION['fechaHoraUltimaConexionAnterior'] = $oUsuario->T01_FechaHoraUltimaConexion; // guarda en la sesion el valor de la ultima conexion del usuario
             
             $sqlUpdateDatosUsuario = "UPDATE T01_Usuario SET T01_NumConexiones = (T01_NumConexiones + 1) , T01_FechaHoraUltimaConexion = :FechaHoraUltimaConexion WHERE T01_CodUsuario=:CodUsuario";
 
@@ -72,13 +94,6 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                           ]; 
 
             $consultaUpdateDatosUsuario->execute($parametros); // ejecuto la consulta pasando los parametros del array de parametros
-            
-            if(!isset($_COOKIE['idioma'])){ // si no existe la cookie 'idioma'
-                setcookie('idioma','es',time()+2592000); // crea la cookie 'idioma' con el valor 'es' para 30 dias
-            }
-            if(!isset($_COOKIE['saludo'])){ // si no existe la cookie 'saludo'
-                setcookie('saludo','Hola',time()+2592000); // crea la cookie 'saludo' con el valor 'Hola' para 30 dias
-            }
             
             header('Location: programa.php'); // redirige al programa
             exit;
@@ -106,25 +121,36 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
             <meta name="robots"     content="index, follow">      
             <link rel="stylesheet"  href="../webroot/css/estilos.css"       type="text/css" >
             <link rel="icon"        href="../webroot/media/favicon.ico"    type="image/x-icon">
+            <style>
+                form[name="formularioIdioma"]{
+                    position: absolute;
+                    top: 52px;
+                    right: 0;
+                }
+            </style>
         </head>
         <body>
             <header>
                 <h1>LoginLogoffTema5</h1>
             </header>
             <main class="flex-container-align-item-center">
+                <form name="formularioIdioma" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <button class="idioma" type="submit" name="es" value="es"> Castellano</button>
+                    <button class="idioma" type="submit" name="en" value="en"> English</button>
+                </form>
                 <form name="login" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
                     <div>
-                        <label for="CodUsuario">Usuario</label>
-                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="Usuario" value="<?php
+                        <label for="CodUsuario"><?php echo $usuario; ?></label>
+                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="<?php echo $usuario; ?>" value="<?php
                             echo (isset($_REQUEST['CodUsuario'])) ? $_REQUEST['CodUsuario'] : null; 
                             ?>">
                     </div>
                     <div>
-                        <label for="Password">Contraseña</label>
+                        <label for="Password"><?php echo $contrasena; ?></label>
                         <input class="required" type="password" id="Password" name="Password" value="<?php
                             echo (isset($_REQUEST['Password'])) ? $_REQUEST['Password'] : null; 
-                            ?>" placeholder="Password">
+                            ?>" placeholder="<?php echo $contrasena; ?>">
                     </div>                
                     
                     <div >

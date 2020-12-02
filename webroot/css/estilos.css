@@ -152,3 +152,10 @@ form[name="login"] span{
     position: fixed;
     bottom: 0;
 }
+
+.idioma{
+    font-size: 1.3rem;
+    border: none;
+    background: none;
+    color: blue;
+} 

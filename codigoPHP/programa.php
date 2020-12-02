@@ -1,7 +1,7 @@
 <?php
 /**
  *   @author: Javier Nieto Lorenzo
- *   @since: 01/12/2020
+ *   @since: 02/12/2020
  *   Programa
 */
 
@@ -10,6 +10,28 @@ session_start(); // inicia una sesion, o recupera una existente
 if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado le usuario
     header('Location: login.php'); // redirige al login
     exit;
+}
+
+if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
+    setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+    header('Location: programa.php');
+    exit;
+}
+
+if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
+    setcookie('idioma', $_REQUEST['en'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+    header('Location: programa.php');
+    exit;
+}
+
+switch ($_COOKIE['idioma']) {
+    case 'es':
+        $saludo = "Bienvenido/a";
+        break;
+
+    case 'en':
+        $saludo = "Welcome";
+        break;
 }
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos del formulario
@@ -44,46 +66,17 @@ try { // Bloque de código que puede tener excepciones en el objeto PDO
 
 $entradaOK=true; // declaro la variable que determina si esta bien la entrada de los campos introducidos por el usuario
 
-$erroresIdioma=null; //declaro e inicializo la variable de errores
 
-$idioma=null; //declaro e inicializo la variable del idioma
-
-if (isset($_REQUEST['cerrarSesion']) || isset($_REQUEST['Detalle'])) { // si se ha pulsado el botton de cerrar sesion
-    if ($_COOKIE['idioma'] != $_REQUEST['idioma']) { // si la cookie 'idioma' tieneel distinto valor del que se ha enviado en el formulario
-        $erroresIdioma = validacionFormularios::validarElementoEnLista($_REQUEST['idioma'], ['es', 'en', 'fr']); // valido el campo que ha seleccionado el usuario
-
-        if ($erroresIdioma != null) { // si hay algun mensaje de error 
-            $entradaOK = false; // le doy el valor false a $entradaOK
-        }
-
-        if ($entradaOK) {
-            $idioma = $_REQUEST['idioma']; // asigno a la variable el valor recibido del formulario
-            setcookie('idioma', $idioma,time()+2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
-
-            if ($idioma == "en") { // si el idioma seleccionado es 'en'
-                setcookie('saludo', 'Hello',time()+2592000);  // modifica el valor de la cookie 'saludo' para 30 dias
-            }
-            if ($idioma == "fr") { // si el idioma seleccionado es 'fr'
-                setcookie('saludo', 'Salut',time()+2592000);  // modifica el valor de la cookie 'saludo'  para 30 dias
-            }
-            if ($idioma == "es") { // si el idioma seleccionado es 'es'
-                setcookie('saludo', 'Hola',time()+2592000);  // modifica el valor de la cookie 'saludo'  para 30 dias
-            }
-        }
-    }
-    
-    if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
-        session_destroy(); // destruye todos los datos asociados a la sesion
-        header("Location: login.php"); // redirige al index del tema 5
-        exit;
-    }
-
-    if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
-        header('Location: detalle.php'); // redire¡ige a la misma pagina
-        exit;
-    }
+if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
+    session_destroy(); // destruye todos los datos asociados a la sesion
+    header("Location: login.php"); // redirige al index del tema 5
+    exit;
 }
 
+if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
+    header('Location: detalle.php'); // redire¡ige a la misma pagina
+    exit;
+}
 
 ?>
 <!DOCTYPE html>
@@ -96,32 +89,32 @@ if (isset($_REQUEST['cerrarSesion']) || isset($_REQUEST['Detalle'])) { // si se 
         <meta name="robots"     content="index, follow">      
         <link rel="stylesheet"  href="../webroot/css/estilos.css"       type="text/css" >
         <link rel="icon"        href="../webroot/media/favicon.ico"    type="image/x-icon">
+        <style>
+            form[name="formularioIdioma"]{
+                position: absolute;
+                top: 52px;
+                right: 0;
+            }
+        </style>
     </head>
     <body>
         <header>
             <h1>Programa</h1>
         </header>
         <main>
-            <h2 class="bienvenida"><?php echo $_COOKIE['saludo'] . " " . $descUsuario; ?> </h2>
-            <p><?php echo ($numConexiones>1) ? "Se ha conectado ". $numConexiones ." veces" : "Esta es la primera vez que se conecta" ; ?></p>
-            <?php echo ($_SESSION['ultimaConexionDAW217LoginLogoffTema5']!=null) ? "<p>Ultima conexion: ". date('d/m/Y H:m:s', $_SESSION['ultimaConexionDAW217LoginLogoffTema5'])."</p>" : null ; ?>
-            <form name="formularioIdioma" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                <div>
-                    <label for ="idioma">Idioma: </label>
-                    <select id="idioma" name="idioma">
-                        <option value="es" <?php echo (($_COOKIE['idioma']) == 'es') ? 'selected' : null; ?> >Castellano</option>
-                        <option value="en" <?php echo (($_COOKIE['idioma']) == 'en') ? 'selected' : null; ?> >English</option>
-                        <option value="fr" <?php echo (($_COOKIE['idioma']) == 'fr') ? 'selected' : null; ?> >Français</option>
-                    </select>
-                    <?php
-                        echo(!is_null($erroresIdioma)) ? "<span style='color:#FF0000'>" . $erroresIdioma . "</span>" : null;   // si el campo es erroneo se muestra un mensaje de error
-                    ?>
-                </div>
-                <div>
-                    <button class="button" type="submit" name="Detalle"> Detalle</button>
-                    <button class="logout" type="submit" name='cerrarSesion'>Cerrar Sesion</button>
-                </div>
+            <form name="logout" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                <button class="logout" type="submit" name='cerrarSesion'>Cerrar Sesion</button>
             </form>
+            <form name="formularioIdioma" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                <button class="idioma" type="submit" name="es" value="es"> Castellano</button>
+                <button class="idioma" type="submit" name="en" value="en"> English</button>
+            </form>
+            <h2 class="bienvenida"><?php echo $saludo . " " . $descUsuario; ?> </h2>
+            <p><?php echo ($numConexiones>1) ? "Se ha conectado ". $numConexiones ." veces" : "Esta es la primera vez que se conecta" ; ?></p>
+            <?php echo ($_SESSION['fechaHoraUltimaConexionAnterior']!=null) ? "<p>Ultima conexion: ". date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior'])."</p>" : null ; ?>
+            
+            <a href="detalle.php"><button class="button" name="Detalle"> Detalle</button></a>
+            
         </main>
     </body>
     <footer class="fixed">
