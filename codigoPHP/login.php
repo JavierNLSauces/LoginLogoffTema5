@@ -5,8 +5,10 @@
  *   Login
  */
 if(!isset($_COOKIE['idioma'])){
-    setcookie('idioma','es',time()+2592000,'codigoPHP'); // crea la cookie 'idioma' con el valor 'es' para 30 dias
-}else{
+    setcookie('idioma','es',time()+2592000); // crea la cookie 'idioma' con el valor 'es' para 30 dias
+    header('Location: registro.php');
+    exit;
+}
     if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
         setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
         header('Location: login.php');
@@ -18,7 +20,7 @@ if(!isset($_COOKIE['idioma'])){
         header('Location: login.php');
         exit;
     }
-}
+
 switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
     case 'es':
         $usuario = "Usuario";

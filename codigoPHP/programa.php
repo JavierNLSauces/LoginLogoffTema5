@@ -12,6 +12,18 @@ if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado 
     exit;
 }
 
+if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
+    session_destroy(); // destruye todos los datos asociados a la sesion
+    header("Location: login.php"); // redirige al index del tema 5
+    exit;
+}
+
+if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
+    header('Location: detalle.php'); // redire¡ige a la misma pagina
+    exit;
+}
+
+
 if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
     setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
     header('Location: programa.php');
@@ -67,16 +79,6 @@ try { // Bloque de código que puede tener excepciones en el objeto PDO
 $entradaOK=true; // declaro la variable que determina si esta bien la entrada de los campos introducidos por el usuario
 
 
-if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
-    session_destroy(); // destruye todos los datos asociados a la sesion
-    header("Location: login.php"); // redirige al index del tema 5
-    exit;
-}
-
-if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
-    header('Location: detalle.php'); // redire¡ige a la misma pagina
-    exit;
-}
 
 ?>
 <!DOCTYPE html>
