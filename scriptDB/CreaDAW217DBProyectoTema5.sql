@@ -6,9 +6,9 @@ USE DAW217DBProyectoTema5;
 CREATE TABLE IF NOT EXISTS T02_Departamento (
     T02_CodDepartamento VARCHAR(3) PRIMARY KEY,
     T02_DescDepartamento VARCHAR(255) NOT NULL,
-    T02_FechaCreacionDepartamento INT NULL,
-    T02_VolumenNegocio FLOAT NULL,
-    T02_FechaBajaDepartamento DATE NULL
+    T02_FechaCreacionDepartamento INT NOT NULL,
+    T02_VolumenNegocio FLOAT NOT NULL,
+    T02_FechaBajaDepartamento INT DEFAULT NULL
 )ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS T01_Usuario(
@@ -23,6 +23,6 @@ CREATE TABLE IF NOT EXISTS T01_Usuario(
 
 -- CREACION USUARIO ADMINISTRADOR
 -- Creacion de usuario administrador de la base de datos: usuarioDAW217DBDepartamentos / paso
-CREATE USER 'usuarioDAW217DBProyectoTema5'@'%' IDENTIFIED BY 'P@ssw0rd';
+CREATE USER 'usuarioDAW217DBProyectoTema5'@'%' IDENTIFIED BY 'paso';
 -- Permisos para la base de datos
 GRANT ALL PRIVILEGES ON DAW217DBProyectoTema5.* TO 'usuarioDAW217DBProyectoTema5'@'%';

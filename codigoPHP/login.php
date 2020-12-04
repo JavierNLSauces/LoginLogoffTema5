@@ -6,30 +6,34 @@
  */
 if(!isset($_COOKIE['idioma'])){
     setcookie('idioma','es',time()+2592000); // crea la cookie 'idioma' con el valor 'es' para 30 dias
-    header('Location: registro.php');
+    header('Location: login.php');
     exit;
 }
-    if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
-        setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
-        header('Location: login.php');
-        exit;
-    }
+if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
+    setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+    header('Location: login.php');
+    exit;
+}
 
-    if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
-        setcookie('idioma', $_REQUEST['en'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
-        header('Location: login.php');
-        exit;
-    }
+if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
+    setcookie('idioma', $_REQUEST['en'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+    header('Location: login.php');
+    exit;
+}
 
 switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
     case 'es':
         $usuario = "Usuario";
         $contrasena = "Contraseña";
+        $lang_login = "Iniciar Sesion"; 
+        $lang_registro = "Registrarse";
         break;
 
     case 'en':
         $usuario = "User";
         $contrasena = "Password";
+        $lang_login = "Login"; 
+        $lang_registro = "Sign Up";
         break;
 }
 
@@ -52,12 +56,9 @@ if (isset($_REQUEST["IniciarSesion"])) { // comprueba que el usuario le ha dado 
 
     $aErrores['Password'] = validacionFormularios::validarPassword($_REQUEST['Password'], 8, 1, 1, OBLIGATORIO);// comprueba que la entrada del password es correcta
 
-    
-    foreach ($aErrores as $campo => $error) { // recorro el array de errores
-        if ($error != null) { // compruebo si hay algun mensaje de error en algun campo
-            $entradaOK = false; // le doy el valor false a $entradaOK
-            $_REQUEST[$campo] = ""; // si hay algun campo que tenga mensaje de error pongo $_REQUEST a null
-        }
+    if ($aErrores['CodUsuario'] != null || $aErrores['Password']!=null) { // compruebo si hay algun mensaje de error en algun campo
+        $entradaOK = false; // le doy el valor false a $entradaOK
+        unset($_REQUEST); 
     }
 } else { // si el usuario no le ha dado al boton de enviar
     $entradaOK = false; // le doy el valor false a $entradaOK
@@ -123,13 +124,6 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
             <meta name="robots"     content="index, follow">      
             <link rel="stylesheet"  href="../webroot/css/estilos.css"       type="text/css" >
             <link rel="icon"        href="../webroot/media/favicon.ico"    type="image/x-icon">
-            <style>
-                form[name="formularioIdioma"]{
-                    position: absolute;
-                    top: 52px;
-                    right: 0;
-                }
-            </style>
         </head>
         <body>
             <header>
@@ -137,8 +131,8 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
             </header>
             <main class="flex-container-align-item-center">
                 <form name="formularioIdioma" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                    <button class="idioma" type="submit" name="es" value="es"> Castellano</button>
-                    <button class="idioma" type="submit" name="en" value="en"> English</button>
+                    <button <?php echo ($_COOKIE['idioma']=="es")? "style='color: black;'" : null ;?> class="idioma " type="submit" name="es" value="es"> Castellano</button>
+                    <button <?php echo ($_COOKIE['idioma']=="en")? "style='color: black;'" : null ;?> class="idioma" type="submit" name="en" value="en"> English</button>
                 </form>
                 <form name="login" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
@@ -155,15 +149,18 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                             ?>" placeholder="<?php echo $contrasena; ?>">
                     </div>                
                     
-                    <div >
-                        <button class="button" type="submit" name="IniciarSesion">Iniciar Sesion</button>
+                    <div>
+                        <button class="button" type="submit" name="IniciarSesion"><?php echo $lang_login; ?></button>
+                        <a class="registrarse" href="registro.php"><?php echo $lang_registro; ?></a>
                     </div>
 
                 </form>
 
         </main>
         <footer class="fixed">
-            <address> <a href="../../index.html">&copy; 2020-2021 Javier Nieto Lorenzo</a> <a href="https://github.com/JavierNLSauces/"><img class="github" width="40" src="../webroot/media/github.png" ></a></address>
+            <a href="http://daw217.ieslossauces.es/" target="_blank"> <img src="../webroot/media/oneandone.png" alt="oneandone icon" width="40"></a>
+            <address>  <a href="../../index.html">&copy; 2020-2021 Javier Nieto Lorenzo</a> </address>
+            <a href="https://github.com/JavierNLSauces/" target="_blank"><img class="github" width="40" src="../webroot/media/github.png" ></a>
         </footer>
     </body>
 </html>
