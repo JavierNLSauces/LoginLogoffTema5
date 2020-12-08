@@ -4,8 +4,6 @@
  *   @since: 02/12/2020
  *   Programa
 */
-
-
 session_start(); // inicia una sesion, o recupera una existente
 if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado le usuario
     header('Location: login.php'); // redirige al login
@@ -14,12 +12,12 @@ if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado 
 
 if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
     session_destroy(); // destruye todos los datos asociados a la sesion
-    header("Location: login.php"); // redirige al index del tema 5
+    header("Location: login.php"); // redirige al login
     exit;
 }
 
 if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
-    header('Location: detalle.php'); // redire¡ige a la misma pagina
+    header('Location: detalle.php'); // redirige a la misma pagina
     exit;
 }
 
@@ -56,37 +54,34 @@ try { // Bloque de código que puede tener excepciones en el objeto PDO
 
 $entradaOK=true; // declaro la variable que determina si esta bien la entrada de los campos introducidos por el usuario
 
+$aLang['es']=[ // array de las traducciones al castellano
+             'title' => 'Programa',
+             'logoff' => 'Cerrar Sesion',
+             'welcome' => 'Bienvenido/a '. $descUsuario,
+             'numConnections' => 'Se ha conectado '. $numConexiones .' veces',
+             'numConnectionsWelcome' => 'Esta es la primera vez que se conecta',  
+             'lastConnection' => 'Ultima conexion: '. date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior']),
+             'details' => 'Detalle',
+             'editProfile' => 'Editar Perfil'
+];
 
-switch ($_COOKIE['idioma']) {
-    case 'es':
-        $lang_title = "Programa";
-        $lang_logoff = "Cerrar Sesion";
-        $lang_welcome = "Bienvenido/a ". $descUsuario;
-        $lang_numConnections = "Se ha conectado ". $numConexiones ." veces";
-        $lang_numConnectionsWelcome = "Esta es la primera vez que se conecta";
-        $lang_lastConnection = "Ultima conexion: ". date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior']);
-        $lang_details = "Detalle";
-        $lang_editProfile = "Editar Perfil";
-        break;
-
-    case 'en':
-        $lang_title = "Program";
-        $lang_logoff = "Logoff";
-        $lang_welcome = "Welcome ". $descUsuario;
-        $lang_numConnections = "You have connected ". $numConexiones ." times";
-        $lang_numConnectionsWelcome = "This is the first time you connect";
-        $lang_lastConnection = "Last connection: ". date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior']);;
-        $lang_details = "Detail";
-        $lang_editProfile = "Edit Profile";
-        break;
-}
+$aLang['en']=[ // array de las traducciones al ingles
+             'title' => 'Program',
+             'logoff' => 'Logoff',
+             'welcome' => 'Welcome '. $descUsuario,
+             'numConnections' => 'You have connected '. $numConexiones .' times',
+             'numConnectionsWelcome' => 'This is the first time you connect',  
+             'lastConnection' => 'Last connection: '. date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior']),
+             'details' => 'Detail',
+             'editProfile' => 'Edit Profile' 
+];
 
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title><?php echo $lang_title ?></title>
+        <title><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></title>
         <meta name="viewport"   content="width=device-width, initial-scale=1.0">
         <meta name="author"     content="Javier Nieto Lorenzo">
         <meta name="robots"     content="index, follow">      
@@ -124,22 +119,22 @@ switch ($_COOKIE['idioma']) {
     </head>
     <body>
         <header>
-            <h1><?php echo $lang_title ?></h1>
+            <h1><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></h1>
             <div class="buttons-header">
-                <a href="detalle.php"><button class="button" name="Detalle"> <?php echo $lang_details ?></button></a>
-                <a href="editarPerfil.php"><button class="button" name="EditarPefil"> <?php echo $lang_editProfile ?></button></a>
-                <?php echo ($imagenUsuario!= null) ?'<img id="fotoPerfil" src = "data:image/png;base64,' . base64_encode($imagenUsuario) . ' alt="Foto de perfil"/>' : "<img id='fotoPerfil' src='../webroot/media/imagen_perfil.png' alt='imagen_perfil'/>";?>
+                <a href="detalle.php"><button class="button" name="Detalle"> <?php echo $aLang[$_COOKIE['idioma']]['details']; ?></button></a>
+                <a href="editarPerfil.php"><button class="button" name="EditarPefil"> <?php echo $aLang[$_COOKIE['idioma']]['editProfile']; ?></button></a>
+                <?php echo ($imagenUsuario!= null) ?'<img id="fotoPerfil" src = "data:image/png;base64,' . base64_encode($imagenUsuario) . '" alt="Foto de perfil"/>' : "<img id='fotoPerfil' src='../webroot/media/imagen_perfil.png' alt='imagen_perfil'/>";?>
                 <form name="logout" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                    <button class="logout" type="submit" name='cerrarSesion'><?php echo $lang_logoff ?></button> 
+                    <button class="logout" type="submit" name='cerrarSesion'><?php echo $aLang[$_COOKIE['idioma']]['logoff']; ?></button> 
                 </form>
             </div>
             
         </header>
         <main class="flex-container-align-item-center">
             <article>
-                <h2 class="bienvenida"><?php echo $lang_welcome ?> </h2>
-                <p><?php echo ($numConexiones>1) ? $lang_numConnections : $lang_numConnectionsWelcome ; ?></p>
-                <?php echo ($_SESSION['fechaHoraUltimaConexionAnterior']!=null) ? "<p>".$lang_lastConnection."</p>" : null ; ?>
+                <h2 class="bienvenida"><?php echo $aLang[$_COOKIE['idioma']]['welcome'] ?> </h2>
+                <p><?php echo ($numConexiones>1) ? $aLang[$_COOKIE['idioma']]['numConnections'] : $aLang[$_COOKIE['idioma']]['numConnectionsWelcome'] ; ?></p>
+                <?php echo ($_SESSION['fechaHoraUltimaConexionAnterior']!=null) ? "<p>".$aLang[$_COOKIE['idioma']]['lastConnection']."</p>" : null ; ?>
             </article>
         </main>
     </body>

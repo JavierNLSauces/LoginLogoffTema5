@@ -4,35 +4,33 @@
  *   @since: 02/12/2020
  *   cambiarPassword
  */
-session_start();
+session_start(); // inicia una sesion, o recupera una existente
 if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado le usuario
     header('Location: login.php'); // redirige al login
     exit;
 }
-if(isset($_REQUEST['Cancelar'])){
-    header('Location: editarPerfil.php');
+if(isset($_REQUEST['Cancelar'])){ // si se ha pulsado el boton cancelar
+    header('Location: editarPerfil.php'); // redirige a editarPerfil.php
     exit;
 }
 
-switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
-    case 'es':
-        $lang_title = " Cambiar Password";
-        $lang_password = "Contraseña";
-        $lang_newPassword = "Nueva contraseña";
-        $lang_repeatedPassword = "Confirmar contraseña";
-        $lang_change = "Cambiar";
-        $lang_cancel = "Cancelar";
-        break;
+$aLang['es']=[ // array de las traducciones al castellano
+             'title' => 'Cambiar Password',
+             'password' => 'Contraseña',
+             'newPassword' => 'Nueva contraseña',
+             'confirmPassword' => 'Confirmar contraseña',
+             'change' => 'Cambiar',  
+             'cancel' => 'Cancelar'  
+];
 
-    case 'en':
-        $lang_title = " Change Password";
-        $lang_password = "Password";
-        $lang_newPassword = "New password";
-        $lang_repeatedPassword = "Confirm password";
-        $lang_change = "Change";
-        $lang_cancel = "Cancel";
-        break;
-}
+$aLang['en']=[ // array de las traducciones al ingles
+             'title' => 'Change Password',
+             'password' => 'Password',
+             'newPassword' => 'New password',
+             'confirmPassword' => 'Confirm password',
+             'change' => 'Change',  
+             'cancel' => 'Cancel'  
+];
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos de formularios
 require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
@@ -67,9 +65,9 @@ if (isset($_REQUEST["Cambiar"])) { // comprueba que el usuario le ha dado a al b
                       ]; 
 
         $consultaUsuario->execute($parametros); // ejecuto la consulta pasando los parametros del array de parametros
-        $oUsuario = $consultaUsuario->fetchObject();
-        if($oUsuario->T01_Password != hash('sha256', $_SESSION['usuarioDAW217LoginLogoffTema5'].$_REQUEST['Password'])){
-            $aErrores['Password']="Contraseña incorrecta";
+        $oUsuario = $consultaUsuario->fetchObject(); // se almacenan los datos de la consulta en forma de objeto
+        if($oUsuario->T01_Password != hash('sha256', $_SESSION['usuarioDAW217LoginLogoffTema5'].$_REQUEST['Password'])){ // si el password que ha introducido y el de la base de datos no coincide
+            $aErrores['Password']="Contraseña incorrecta"; // se almacena un mensaje de error en el campo del password
         }
 
         } catch (PDOException $miExceptionPDO) { // Codigo que se ejecuta si hay alguna excepcion
@@ -82,8 +80,8 @@ if (isset($_REQUEST["Cambiar"])) { // comprueba que el usuario le ha dado a al b
         }
     }
     
-    if($_REQUEST['PasswordNueva']!=$_REQUEST['PasswordRepetida']){
-        $aErrores['PasswordRepetida'] = "Las contraseñas no coinciden";
+    if($_REQUEST['PasswordNueva']!=$_REQUEST['PasswordRepetida']){ // si la password nueva y la pasword de confirmacion no coinciden
+        $aErrores['PasswordRepetida'] = "Las contraseñas no coinciden"; // se almacena un mensaje de error en el campo del password repetido
     }
     
     foreach ($aErrores as $campo => $error) { // recorro el array de errores
@@ -131,7 +129,7 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
     <html>
         <head>
             <meta charset="UTF-8">
-            <title><?php echo $lang_title ?></title>
+            <title><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></title>
             <meta name="viewport"   content="width=device-width, initial-scale=1.0">
             <meta name="author"     content="Javier Nieto Lorenzo">
             <meta name="robots"     content="index, follow">      
@@ -140,15 +138,15 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
         </head>
         <body>
             <header>
-                <h1><?php echo $lang_title ?></h1>
+                <h1><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></h1>
             </header>
             <main class="flex-container-align-item-center">
                 
                 <form name="singup" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
                     <div>
-                        <label for="Password"><?php echo $lang_password ?></label>
-                        <input class="required" type="password" id="Password" name="<?php echo $lang_password ?>" value="<?php
+                        <label for="Password"><?php echo $aLang[$_COOKIE['idioma']]['password']; ?></label>
+                        <input class="required" type="password" id="Password" name="<?php echo $aLang[$_COOKIE['idioma']]['password']; ?>" value="<?php
                             echo (isset($_REQUEST['Password'])) ? $_REQUEST['Password'] : null; 
                             ?>" placeholder="Contraseña">
                         
@@ -158,10 +156,10 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                     ?>
                     
                     <div>
-                        <label for="PasswordNueva"><?php echo $lang_newPassword ?></label>
+                        <label for="PasswordNueva"><?php echo $aLang[$_COOKIE['idioma']]['newPassword']; ?></label>
                         <input style="width: 210px;" class="required" type="password" id="PasswordRepetida" name="PasswordNueva" value="<?php
                             echo (isset($_REQUEST['PasswordNueva'])) ? $_REQUEST['PasswordNueva'] : null; 
-                            ?>" placeholder="<?php echo $lang_newPassword ?>">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['newPassword']; ?>">
                         
                     </div>          
                     <?php
@@ -169,18 +167,18 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                     ?>
                     
                     <div>
-                        <label for="PasswordRepetida"><?php echo $lang_repeatedPassword ?></label>
+                        <label for="PasswordRepetida"><?php echo $aLang[$_COOKIE['idioma']]['confirmPassword']; ?></label>
                         <input style="width: 235px;" class="required" type="password" id="PasswordRepetida" name="PasswordRepetida" value="<?php
                             echo (isset($_REQUEST['PasswordRepetida'])) ? $_REQUEST['PasswordRepetida'] : null; 
-                            ?>" placeholder="<?php echo $lang_repeatedPassword ?>">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['confirmPassword']; ?>">
                         
                     </div>          
                     <?php
                         echo ($aErrores['PasswordRepetida'] != null) ? "<span style='color:#FF0000'>" . $aErrores['PasswordRepetida'] . "</span>" : null; // si el campo es erroneo se muestra un mensaje de error
                     ?>
                     <div >
-                        <button class="button" type="submit" name="Cambiar"><?php echo $lang_change ?></button>
-                        <button class="button" name="Cancelar"><?php echo $lang_cancel ?></button>
+                        <button class="button" type="submit" name="Cambiar"><?php echo $aLang[$_COOKIE['idioma']]['change']; ?></button>
+                        <button class="button" name="Cancelar"><?php echo $aLang[$_COOKIE['idioma']]['cancel']; ?></button>
                     </div>
 
                 </form>

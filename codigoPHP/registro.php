@@ -9,27 +9,25 @@ if(isset($_REQUEST['Cancelar'])){
     exit;
 }
 
-switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
-    case 'es':
-        $lang_title = "Registro";
-        $lang_usuario = "Usuario";
-        $lang_descripcion = "Descripcion";
-        $lang_contrasena = "Contraseña";
-        $lang_repeatedPassword = "Confirmar contraseña";
-        $lang_registro = "Registrarse";
-        $lang_cancelar = "Cancelar";
-        break;
+$aLang['es']=[ // array de las traducciones al castellano
+             'title' => 'Registro',
+             'user' => 'Usuario',
+             'description' => 'Descripcion',
+             'password' => 'Contraseña',
+             'confirmPassword' => 'Confirmar contraseña',  
+             'signup' => 'Registrarse',
+             'cancel' => 'Cancelar',
+];
 
-    case 'en':
-        $lang_title = "Sign Up";
-        $lang_usuario = "User";
-        $lang_descripcion = "Description";
-        $lang_contrasena = "Password";
-        $lang_repeatedPassword = "Confirm password";
-        $lang_registro = "Sign Up";
-        $lang_cancelar = "Cancel";
-        break;
-}
+$aLang['en']=[ // array de las traducciones al ingles
+             'title' => 'Sign Up',
+             'user' => 'User',
+             'description' => 'Description',
+             'password' => 'Password',
+             'confirmPassword' => 'Confirm password',  
+             'signup' => 'Sign Up',
+             'cancel' => 'Cancel',
+];
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos de formularios
 require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
@@ -135,7 +133,7 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
     <html>
         <head>
             <meta charset="UTF-8">
-            <title><?php echo $lang_title; ?></title>
+            <title><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></title>
             <meta name="viewport"   content="width=device-width, initial-scale=1.0">
             <meta name="author"     content="Javier Nieto Lorenzo">
             <meta name="robots"     content="index, follow">      
@@ -144,15 +142,15 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
         </head>
         <body>
             <header>
-                <h1><?php echo $lang_title; ?></h1>
+                <h1><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></h1>
             </header>
             <main class="flex-container-align-item-center">
                 
                 <form name="singup" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
                     <div>
-                        <label for="CodUsuario"><?php echo $lang_usuario; ?></label>
-                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="<?php echo $lang_usuario; ?>" value="<?php
+                        <label for="CodUsuario"><?php echo $aLang[$_COOKIE['idioma']]['user']; ?></label>
+                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['user']; ?>" value="<?php
                             echo (isset($_REQUEST['CodUsuario'])) ? $_REQUEST['CodUsuario'] : null; 
                             ?>">
                         
@@ -161,8 +159,8 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                         echo ($aErrores['CodUsuario']!=null) ? "<span style='color:#FF0000'>".$aErrores['CodUsuario']."</span>" : null;// si el campo es erroneo se muestra un mensaje de error
                     ?>
                     <div>
-                        <label for="DescUsuario"><?php echo $lang_descripcion; ?></label>
-                        <input class="required" type="text" id="DescUsuario" name="DescUsuario" placeholder="<?php echo $lang_descripcion; ?>" value="<?php
+                        <label for="DescUsuario"><?php echo $aLang[$_COOKIE['idioma']]['description']; ?></label>
+                        <input class="required" type="text" id="DescUsuario" name="DescUsuario" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['description']; ?>" value="<?php
                             echo (isset($_REQUEST['DescUsuario'])) ? $_REQUEST['DescUsuario'] : null; 
                             ?>">
                         
@@ -171,28 +169,28 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                         echo ($aErrores['DescUsuario']!=null) ? "<span style='color:#FF0000'>".$aErrores['DescUsuario']."</span>" : null;// si el campo es erroneo se muestra un mensaje de error
                     ?>
                     <div>
-                        <label for="Password"><?php echo $lang_contrasena; ?></label>
+                        <label for="Password"><?php echo $aLang[$_COOKIE['idioma']]['password']; ?></label>
                         <input class="required" type="password" id="Password" name="Password" value="<?php
                             echo (isset($_REQUEST['Password'])) ? $_REQUEST['Password'] : null; 
-                            ?>" placeholder="<?php echo $lang_contrasena; ?>">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['password']; ?>">
                         
                     </div>          
                     <?php
                         echo ($aErrores['Password'] != null) ? "<span style='color:#FF0000'>" . $aErrores['Password'] . "</span>" : null; // si el campo es erroneo se muestra un mensaje de error
                     ?>
                     <div>
-                        <label for="PasswordConfirmacion"><?php echo $lang_repeatedPassword; ?></label>
+                        <label for="PasswordConfirmacion"><?php echo $aLang[$_COOKIE['idioma']]['confirmPassword']; ?></label>
                         <input style="width: 250px;" class="required" type="password" id="PasswordConfirmacion" name="PasswordConfirmacion" value="<?php
                             echo (isset($_REQUEST['PasswordConfirmacion'])) ? $_REQUEST['PasswordConfirmacion'] : null; 
-                            ?>" placeholder="<?php echo $lang_repeatedPassword; ?>">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['confirmPassword']; ?>">
                         
                     </div>          
                     <?php
                         echo ($aErrores['PasswordConfirmacion'] != null) ? "<span style='color:#FF0000'>" . $aErrores['PasswordConfirmacion'] . "</span>" : null; // si el campo es erroneo se muestra un mensaje de error
                     ?>
                     <div >
-                        <button class="button" type="submit" name="Registrarse"><?php echo $lang_registro; ?></button>
-                        <button class="button" name="Cancelar"><?php echo $lang_cancelar; ?></button>
+                        <button class="button" type="submit" name="Registrarse"><?php echo $aLang[$_COOKIE['idioma']]['signup']; ?></button>
+                        <button class="button" name="Cancelar"><?php echo $aLang[$_COOKIE['idioma']]['cancel']; ?></button>
                     </div>
 
                 </form>

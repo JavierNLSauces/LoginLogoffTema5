@@ -20,22 +20,19 @@ if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
     header('Location: login.php');
     exit;
 }
+$aLang['es']=[ // array de las traducciones al castellano
+             'user' => 'Usuario',
+             'password' => 'Contraseña',
+             'login' => 'Iniciar Sesion',
+             'signup' => 'Registrarse'
+];
 
-switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
-    case 'es':
-        $usuario = "Usuario";
-        $contrasena = "Contraseña";
-        $lang_login = "Iniciar Sesion"; 
-        $lang_registro = "Registrarse";
-        break;
-
-    case 'en':
-        $usuario = "User";
-        $contrasena = "Password";
-        $lang_login = "Login"; 
-        $lang_registro = "Sign Up";
-        break;
-}
+$aLang['en']=[ // array de las traducciones al ingles
+             'user' => 'User',
+             'password' => 'Password',
+             'login' => 'Login',
+             'signup' => 'Sign Up'
+];
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos de formularios
 require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
@@ -137,21 +134,21 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                 <form name="login" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
                     <div>
-                        <label for="CodUsuario"><?php echo $usuario; ?></label>
-                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="<?php echo $usuario; ?>" value="<?php
+                        <label for="CodUsuario"><?php echo $aLang[$_COOKIE['idioma']]['user']; ?></label>
+                        <input class="required" type="text" id="CodUsuario" name="CodUsuario" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['user']; ?>" value="<?php
                             echo (isset($_REQUEST['CodUsuario'])) ? $_REQUEST['CodUsuario'] : null; 
                             ?>">
                     </div>
                     <div>
-                        <label for="Password"><?php echo $contrasena; ?></label>
+                        <label for="Password"><?php echo $aLang[$_COOKIE['idioma']]['password']; ?></label>
                         <input class="required" type="password" id="Password" name="Password" value="<?php
                             echo (isset($_REQUEST['Password'])) ? $_REQUEST['Password'] : null; 
-                            ?>" placeholder="<?php echo $contrasena; ?>">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['password']; ?>">
                     </div>                
                     
                     <div>
-                        <button class="button" type="submit" name="IniciarSesion"><?php echo $lang_login; ?></button>
-                        <a class="registrarse" href="registro.php"><?php echo $lang_registro; ?></a>
+                        <button class="button" type="submit" name="IniciarSesion"><?php echo $aLang[$_COOKIE['idioma']]['login']; ?></button>
+                        <a class="registrarse" href="registro.php"><?php echo $aLang[$_COOKIE['idioma']]['signup']; ?></a>
                     </div>
 
                 </form>
