@@ -11,14 +11,32 @@ if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado 
     exit;
 }
 
-if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
-    session_destroy(); // destruye todos los datos asociados a la sesion
-    header("Location: login.php"); // redirige al index del tema 5
-    exit;
-}
+require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
 
-if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
-    header('Location: detalle.php'); // redire¡ige a la misma pagina
+if (isset($_REQUEST['BorrarUsuario'])) { // si se ha pulsado el boton de Detalle
+    try { // Bloque de código que puede tener excepciones en el objeto PDO
+        $miDB = new PDO(DNS, USER, PASSWORD); // creo un objeto PDO con la conexion a la base de datos
+
+        $miDB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Establezco el atributo para la apariciopn de errores y le pongo el modo para que cuando haya un error se lance una excepcion
+
+        $sqlUsuario = "DELETE FROM T01_Usuario WHERE T01_CodUsuario=:CodUsuario"; 
+
+        $consultaUsuario = $miDB->prepare($sqlUsuario); // prepara la consulta
+        $parametros = [':CodUsuario' => $_SESSION['usuarioDAW217LoginLogoffTema5'] // creo el array de parametros con el valor de los parametros de la consulta
+                      ];
+
+        $consultaUsuario->execute($parametros); // ejecuto la consulta pasando los parametros del array de parametros
+
+    } catch (PDOException $miExceptionPDO) { // Codigo que se ejecuta si hay alguna excepcion
+        echo "<p style='color:red;'>ERROR EN LA CONEXION</p>";
+        echo "<p style='color:red;'>Código de error: " . $miExceptionPDO->getCode() . "</p>"; // Muestra el codigo del error
+        echo "<p style='color:red;'>Error: " . $miExceptionPDO->getMessage() . "</p>"; // Muestra el mensaje de error
+        die(); // Finalizo el script
+    } finally { // codigo que se ejecuta haya o no errores
+        unset($miDB); // destruyo la variable 
+    } 
+    session_destroy(); // Destruye toda los datosn asociados a la sesion actual
+    header('Location: login.php'); // redire¡ige a la misma pagina
     exit;
 }
 
@@ -49,6 +67,7 @@ $aLang['es']=[ // array de las traducciones al castellano
              'lastConnection' => 'Ultima conexion',
              'password' => 'Cambiar contraseña',
              'imageUser' => 'Imagen Usuario',
+             'delUser' => 'Borrar Usuario',
              'change' => 'Editar',
              'cancel' => 'Cancelar'
 ];
@@ -62,12 +81,13 @@ $aLang['en']=[ // array de las traducciones al ingles
              'lastConnection' => 'Last Connection',
              'password' => 'Change password',
              'imageUser' => 'User image',
+             'delUser' => 'Detele User',
              'change' => 'Edit',
              'cancel' => 'Cancel' 
 ];
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos del formulario
-require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
+
 
 try { // Bloque de código que puede tener excepciones en el objeto PDO
     $miDB = new PDO(DNS, USER, PASSWORD); // creo un objeto PDO con la conexion a la base de datos
@@ -191,10 +211,6 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
         <header>
             <h1><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></h1>
             
-            <form name="logout" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                <button class="logout" type="submit" name='cerrarSesion'><?php echo $aLang[$_COOKIE['idioma']]['logoff']; ?></button>
-            </form>
-            
         </header>
         <main class="flex-container-align-item-center">
             <form name="editarPerfil" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
@@ -237,6 +253,7 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                     <a class="registrarse" href="cambiarPassword.php"><?php echo $aLang[$_COOKIE['idioma']]['password'] ?></a>
                     <button style="margin:auto;" class="button" type="submit" name="Editar"><?php echo $aLang[$_COOKIE['idioma']]['change'] ?></button>
                     <button style="margin:auto; margin-top: 5px;" class="button" name="Cancelar"><?php echo $aLang[$_COOKIE['idioma']]['cancel'] ?></button>
+                    <button style="margin:auto; margin-top: 5px;" id="borrarUsuario" class="button" name="BorrarUsuario"><?php echo $aLang[$_COOKIE['idioma']]['delUser'];?></button>
                 </div>
 
                 </form>

@@ -9,14 +9,9 @@ if(!isset($_COOKIE['idioma'])){
     header('Location: login.php');
     exit;
 }
-if (isset($_REQUEST['es'])) { // si se ha pulsado el botton de cerrar sesion
-    setcookie('idioma', $_REQUEST['es'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
-    header('Location: login.php');
-    exit;
-}
 
-if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
-    setcookie('idioma', $_REQUEST['en'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
+if (isset($_REQUEST['idioma'])) { // si se ha pulsado el botton de cerrar sesion
+    setcookie('idioma', $_REQUEST['idioma'], time() + 2592000); // modifica la cookie 'idioma' con el valor recibido del formulario para 30 dias
     header('Location: login.php');
     exit;
 }
@@ -128,8 +123,8 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
             </header>
             <main class="flex-container-align-item-center">
                 <form name="formularioIdioma" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                    <button <?php echo ($_COOKIE['idioma']=="es")? "style='color: black;'" : null ;?> class="idioma " type="submit" name="es" value="es"> Castellano</button>
-                    <button <?php echo ($_COOKIE['idioma']=="en")? "style='color: black;'" : null ;?> class="idioma" type="submit" name="en" value="en"> English</button>
+                    <button <?php echo ($_COOKIE['idioma']=="es")? "style='color: black;'" : null ;?> class="idioma " type="submit" name="idioma" value="es"> Castellano</button>
+                    <button <?php echo ($_COOKIE['idioma']=="en")? "style='color: black;'" : null ;?> class="idioma" type="submit" name="idioma" value="en"> English</button>
                 </form>
                 <form name="login" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
