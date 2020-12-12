@@ -169,3 +169,9 @@ form[name="formularioIdioma"]{
 #fotoPerfil{
     width: 50px;
 }
+
+#borrarUsuario{
+    background-color: #fd849b;
+    border-radius: 20px;
+    border: 2px solid #f24646;
+}
