@@ -11,14 +11,32 @@ if(!isset($_SESSION['usuarioDAW217LoginLogoffTema5'])){ // si no se ha logueado 
     exit;
 }
 
-if (isset($_REQUEST['cerrarSesion'])) { // si se ha pulsado el boton de Cerrar Sesion
-    session_destroy(); // destruye todos los datos asociados a la sesion
-    header("Location: login.php"); // redirige al index del tema 5
-    exit;
-}
+require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
 
-if (isset($_REQUEST['Detalle'])) { // si se ha pulsado el boton de Detalle
-    header('Location: detalle.php'); // redire¡ige a la misma pagina
+if (isset($_REQUEST['BorrarUsuario'])) { // si se ha pulsado el boton de Detalle
+    try { // Bloque de código que puede tener excepciones en el objeto PDO
+        $miDB = new PDO(DNS, USER, PASSWORD); // creo un objeto PDO con la conexion a la base de datos
+
+        $miDB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Establezco el atributo para la apariciopn de errores y le pongo el modo para que cuando haya un error se lance una excepcion
+
+        $sqlUsuario = "DELETE FROM T01_Usuario WHERE T01_CodUsuario=:CodUsuario"; 
+
+        $consultaUsuario = $miDB->prepare($sqlUsuario); // prepara la consulta
+        $parametros = [':CodUsuario' => $_SESSION['usuarioDAW217LoginLogoffTema5'] // creo el array de parametros con el valor de los parametros de la consulta
+                      ];
+
+        $consultaUsuario->execute($parametros); // ejecuto la consulta pasando los parametros del array de parametros
+
+    } catch (PDOException $miExceptionPDO) { // Codigo que se ejecuta si hay alguna excepcion
+        echo "<p style='color:red;'>ERROR EN LA CONEXION</p>";
+        echo "<p style='color:red;'>Código de error: " . $miExceptionPDO->getCode() . "</p>"; // Muestra el codigo del error
+        echo "<p style='color:red;'>Error: " . $miExceptionPDO->getMessage() . "</p>"; // Muestra el mensaje de error
+        die(); // Finalizo el script
+    } finally { // codigo que se ejecuta haya o no errores
+        unset($miDB); // destruyo la variable 
+    } 
+    session_destroy(); // Destruye toda los datosn asociados a la sesion actual
+    header('Location: login.php'); // redire¡ige a la misma pagina
     exit;
 }
 
@@ -40,36 +58,36 @@ if (isset($_REQUEST['en'])) { // si se ha pulsado el botton de cerrar sesion
     exit;
 }
 
-switch ($_COOKIE['idioma']) { // dependiendo del valor de la cookie
-    case 'es':
-        $lang_title = " Editar Perfil";
-        $lang_logoff = "Cerrar sesion";
-        $lang_user = "Usuario";
-        $lang_description = "Descripcion";
-        $lang_numConexions = "Numero conexiones";
-        $lang_lastConnection = "Ultima conexion";
-        $lang_password = "Cambiar contraseña";
-        $lang_imageUser = "Imagen Usuario";
-        $lang_change = "Editar";
-        $lang_cancel = "Cancelar";
-        break;
+$aLang['es']=[ // array de las traducciones al castellano
+             'title' => 'Editar Perfil',
+             'logoff' => 'Cerrar sesion',
+             'user' => 'Usuario',
+             'description' => 'Descripcion',
+             'numConexiones' => 'Numero conexiones',  
+             'lastConnection' => 'Ultima conexion',
+             'password' => 'Cambiar contraseña',
+             'imageUser' => 'Imagen Usuario',
+             'delUser' => 'Borrar Usuario',
+             'change' => 'Editar',
+             'cancel' => 'Cancelar'
+];
 
-    case 'en':
-        $lang_title = " Edit profile";
-        $lang_logoff = "Logoff";
-        $lang_user = "User";
-        $lang_description = "Description";
-        $lang_numConexions = "Number connections";
-        $lang_lastConnection = "Last Connection";
-        $lang_password = "Change password";
-        $lang_imageUser = "User image";
-        $lang_change = "Edit";
-        $lang_cancel = "Cancel";
-        break;
-}
+$aLang['en']=[ // array de las traducciones al ingles
+             'title' => 'Edit profile',
+             'logoff' => 'Logoff',
+             'user' => 'User',
+             'description' => 'Description',
+             'numConexiones' => 'Number connections',  
+             'lastConnection' => 'Last Connection',
+             'password' => 'Change password',
+             'imageUser' => 'User image',
+             'delUser' => 'Detele User',
+             'change' => 'Edit',
+             'cancel' => 'Cancel' 
+];
 
 require_once '../core/libreriaValidacion.php'; // incluyo la libreria de validacion para validar los campos del formulario
-require_once '../config/confDBPDO.php'; // incluyo el fichero de configuracion de acceso a la basde de datos
+
 
 try { // Bloque de código que puede tener excepciones en el objeto PDO
     $miDB = new PDO(DNS, USER, PASSWORD); // creo un objeto PDO con la conexion a la base de datos
@@ -145,11 +163,11 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
 
         $miDB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Establezco el atributo para la apariciopn de errores y le pongo el modo para que cuando haya un error se lance una excepcion
 
-        $sqlUpdateDescUsuario = "UPDATE T01_Usuario SET T01_DescUsuario=:DescUsuario, T01_ImagenUsuario=:PathImagenUsuario WHERE T01_CodUsuario=:CodUsuario" ;
+        $sqlUpdateDescUsuario = "UPDATE T01_Usuario SET T01_DescUsuario=:DescUsuario, T01_ImagenUsuario=:ImagenUsuario WHERE T01_CodUsuario=:CodUsuario" ;
 
         $consultaUpdateDescUsuario = $miDB->prepare($sqlUpdateDescUsuario); // prepara la consulta
         $parametros = [':DescUsuario' => $_REQUEST['DescUsuario'],// creo el array de parametros con el valor de los parametros de la consulta
-                       ':PathImagenUsuario' => $imagenUsuario,
+                       ':ImagenUsuario' => $imagenUsuario,
                        ':CodUsuario' => $_SESSION['usuarioDAW217LoginLogoffTema5']
                        ]; 
 
@@ -175,7 +193,7 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
 <html>
     <head>
         <meta charset="UTF-8">
-        <title><?php echo $lang_title ?></title>
+        <title><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></title>
         <meta name="viewport"   content="width=device-width, initial-scale=1.0">
         <meta name="author"     content="Javier Nieto Lorenzo">
         <meta name="robots"     content="index, follow">      
@@ -191,23 +209,19 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
     </head>
     <body>
         <header>
-            <h1><?php echo $lang_title ?></h1>
-            
-            <form name="logout" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                <button class="logout" type="submit" name='cerrarSesion'><?php echo $lang_logoff ?></button>
-            </form>
+            <h1><?php echo $aLang[$_COOKIE['idioma']]['title']; ?></h1>
             
         </header>
         <main class="flex-container-align-item-center">
             <form name="editarPerfil" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
 
                 <div>
-                    <label for="CodUsuario"><?php echo $lang_user ?></label>
+                    <label for="CodUsuario"><?php echo $aLang[$_COOKIE['idioma']]['user']; ?></label>
                     <input class="required" type="text" id="CodUsuario" name="CodUsuario" value="<?php echo $_SESSION['usuarioDAW217LoginLogoffTema5']; ?>" readonly>
                 </div>
                 <div>
-                    <label for="DescUsuario"><?php echo $lang_description ?></label>
-                    <input style="width: 240px;" class="required" type="text" id="DescUsuario" placeholder="<?php echo $lang_description ?>" name="DescUsuario" value="<?php
+                    <label for="DescUsuario"><?php echo $aLang[$_COOKIE['idioma']]['description']; ?></label>
+                    <input style="width: 240px;" class="required" type="text" id="DescUsuario" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['description']; ?>" name="DescUsuario" value="<?php
                         echo (isset($_REQUEST['DescUsuario'])) ? $_REQUEST['DescUsuario'] : $descUsuario; 
                         ?>">
                 </div>
@@ -216,19 +230,19 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                 ?>
                 
                 <div>
-                    <label for="NumConexiones"><?php echo $lang_numConexions ?></label>
+                    <label for="NumConexiones"><?php echo $aLang[$_COOKIE['idioma']]['numConexiones']; ?></label>
                     <input style="width: 100px;" class="required" type="text" id="NumConexiones" name="NumConexiones" value="<?php echo $numConexiones ?>" readonly>
                 </div>
                 
                 <?php if($_SESSION['fechaHoraUltimaConexionAnterior']!=null){ ?>
                 <div>
-                    <label for="UltimaConexion"><?php echo $lang_lastConnection ?></label>
+                    <label for="UltimaConexion"><?php echo $aLang[$_COOKIE['idioma']]['lastConnection']; ?></label>
                     <input style="width: 240px;;" class="required" type="text" id="UltimaConexion" name="UltimaConexion" value="<?php echo date('d/m/Y H:i:s', $_SESSION['fechaHoraUltimaConexionAnterior']) ?>" readonly>
                 </div>
                 <?php } ?>
                 
                 <div style="width: 500px";>
-                    <label for="ImagenUsuario"><?php echo $lang_imageUser ?></label>
+                    <label for="ImagenUsuario"><?php echo $aLang[$_COOKIE['idioma']]['imageUser'] ?></label>
                     <input style="width: 390px;margin: auto; font-size: 1rem" class="required" type="file" id="ImagenUsuario" name="ImagenUsuario" value="">
                 </div>
                 <?php
@@ -236,9 +250,10 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                 ?>
                 
                 <div>
-                    <a class="registrarse" href="cambiarPassword.php"><?php echo $lang_password ?></a>
-                    <button style="margin:auto;" class="button" type="submit" name="Editar"><?php echo $lang_change ?></button>
-                    <button style="margin:auto; margin-top: 5px;" class="button" name="Cancelar"><?php echo $lang_cancel ?></button>
+                    <a class="registrarse" href="cambiarPassword.php"><?php echo $aLang[$_COOKIE['idioma']]['password'] ?></a>
+                    <button style="margin:auto;" class="button" type="submit" name="Editar"><?php echo $aLang[$_COOKIE['idioma']]['change'] ?></button>
+                    <button style="margin:auto; margin-top: 5px;" class="button" name="Cancelar"><?php echo $aLang[$_COOKIE['idioma']]['cancel'] ?></button>
+                    <button style="margin:auto; margin-top: 5px;" id="borrarUsuario" class="button" name="BorrarUsuario"><?php echo $aLang[$_COOKIE['idioma']]['delUser'];?></button>
                 </div>
 
                 </form>
