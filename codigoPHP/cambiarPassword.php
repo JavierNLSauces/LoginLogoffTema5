@@ -145,10 +145,10 @@ if ($entradaOK) { // si la entrada esta bien recojo los valores introducidos y h
                 <form name="singup" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 
                     <div>
-                        <label for="Password"><?php echo $aLang[$_COOKIE['idioma']]['password']; ?></label>
-                        <input class="required" type="password" id="Password" name="<?php echo $aLang[$_COOKIE['idioma']]['password']; ?>" value="<?php
+                        <label for="Password"><?php echo $aLang[$_COOKIE['idiomaActual']]['password']; ?></label>
+                        <input class="required" type="password" id="Password" name="Password" value="<?php
                             echo (isset($_REQUEST['Password'])) ? $_REQUEST['Password'] : null; 
-                            ?>" placeholder="Contraseña">
+                            ?>" placeholder="<?php echo $aLang[$_COOKIE['idioma']]['password']; ?>">
                         
                     </div>          
                     <?php
